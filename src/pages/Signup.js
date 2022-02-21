@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Text, Input, Grid, Button } from "../elements";
 import { useDispatch } from "react-redux";
 import { actionCreators as userActions } from "../redux/modules/user";
+import { emailCheck } from "../shared/common";
 
 const Signup = (props) => {
   const dispatch = useDispatch();
@@ -10,15 +11,23 @@ const Signup = (props) => {
   const [pwd, setPwd] = useState("");
   const [pwd_check, setPwdCheck] = useState("");
   const [user_name, setUserName] = useState("");
+  const [profile, setProfile] = useState("");
 
   const signup = () => {
     if (pwd !== pwd_check) {
+      window.alert("패스워드와 패스워드 확인이 일치하지 않습니다!");
       return;
     }
-    if (id === "" || pwd === "" || user_name === "") {
+    if (id === "" || pwd === "" || user_name === "" || profile === "") {
+      window.alert("아이디, 패스워드, 닉네임,프로필을 모두 입력해주세요!");
       return;
     }
-    dispatch(userActions.signupFB(id, pwd, user_name));
+    if (!emailCheck(id)) {
+      window.alert("이메일 형식이 맞지 않습니다!");
+      return;
+    }
+
+    dispatch(userActions.signupFB(id, pwd, user_name, profile));
   };
 
   return (
@@ -44,6 +53,15 @@ const Signup = (props) => {
             placeholder="닉네임을 입력해주세요"
             _onChange={(e) => {
               setUserName(e.target.value);
+            }}
+          ></Input>
+        </Grid>
+        <Grid padding="16px 0px">
+          <Input
+            label="프로필"
+            placeholder="프로필 주소를 입력해주세요"
+            _onChange={(e) => {
+              setProfile(e.target.value);
             }}
           ></Input>
         </Grid>

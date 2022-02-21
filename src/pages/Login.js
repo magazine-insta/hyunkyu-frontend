@@ -24,6 +24,17 @@ const Login = (props) => {
     }
     dispatch(userActions.loginFB(id, pwd));
   };
+
+  // const onSubmitHandler = (e)=>{
+  //   e.preventDefault();
+  //   let body ={
+  //     email:Email,
+  //     password:Password
+  //   }
+  //   dispatch(loginUser(body))
+  //   Axios.post('/api/users/login',body)
+  //   .then(response=>{})
+  // }
   return (
     <React.Fragment>
       <Grid padding="16px ">
@@ -36,9 +47,7 @@ const Login = (props) => {
           <Input
             label="아이디"
             value={id}
-            _onChange={(e) => {
-              setId(e.target.value);
-            }}
+            _onChange={changeId}
             placeholder="아이디를 입력하세요."
           />
         </Grid>
@@ -46,9 +55,7 @@ const Login = (props) => {
           <Input
             label="비밀번호"
             value={pwd}
-            _onChange={(e) => {
-              setPwd(e.target.value);
-            }}
+            _onChange={changePwd}
             type="password"
             placeholder="비밀번호를 입력하세요."
           />

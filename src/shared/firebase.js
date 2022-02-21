@@ -3,9 +3,12 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import { getAuth } from "firebase/auth";
+import "firebase/compat/storage";
+
+export const apiKey = "AIzaSyDQhI0LuGiVWagmcX61SUObPdRHDdpYR8w";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDQhI0LuGiVWagmcX61SUObPdRHDdpYR8w",
+  apiKey: apiKey,
   authDomain: "pbl-week2-insta.firebaseapp.com",
   projectId: "pbl-week2-insta",
   storageBucket: "pbl-week2-insta.appspot.com",
@@ -15,7 +18,9 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+const firestore = firebase.firestore();
+const storage = firebase.storage();
 
 const auth = getAuth();
 
-export { auth };
+export { auth, firestore, storage };
