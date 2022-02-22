@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Grid, Text, Button, Image, Input } from "../elements";
 import Upload from "../shared/Upload";
 
@@ -21,6 +21,7 @@ const PostWrite = (props) => {
   let _post = is_edit ? post_list.find((p) => p.id === post_id) : null;
 
   const [contents, setContents] = React.useState(_post ? _post.contents : "");
+  const [layout, setLayout] = useState(_post ? _post.layout : "bottom");
 
   React.useEffect(() => {
     if (is_edit && !_post) {
@@ -40,11 +41,16 @@ const PostWrite = (props) => {
   };
 
   const addPost = () => {
-    dispatch(postActions.addPostFB(contents));
+    dispatch(postActions.addPostFB(contents, layout));
   };
 
   const editPost = () => {
-    dispatch(postActions.editPostFB(post_id, { contents: contents }));
+    dispatch(postActions.editPostFB(post_id, { contents: contents, layout }));
+  };
+  const is_checked = (e) => {
+    if (e.target.checked) {
+      setLayout(e.target.value);
+    }
   };
 
   if (!is_login) {
@@ -73,16 +79,71 @@ const PostWrite = (props) => {
         </Text>
         <Upload />
       </Grid>
-
-      <Grid>
-        <Grid padding="16px">
-          <Text margin="0px" size="24px" bold>
-            미리보기
-          </Text>
-        </Grid>
-
+      <Grid padding="16px">
+        <input
+          type="radio"
+          name="layout"
+          value="right"
+          id="right"
+          onChange={is_checked}
+        />
+        <label htmlFor="right">
+          <strong>이미지가 오른편에, 텍스트는 왼편에 위치한 레이아웃</strong>
+        </label>
+      </Grid>
+      <Grid is_flex>
+        <Text width="80%" margin="10px" center>
+          {contents}
+        </Text>
         <Image
-          shape="rectangle"
+          width="50%"
+          shape="half"
+          src={preview ? preview : "http://via.placeholder.com/400x300"}
+        />
+      </Grid>
+
+      <Grid padding="16px">
+        <input
+          type="radio"
+          name="layout"
+          value="left"
+          id="left"
+          onChange={is_checked}
+        />
+        <label htmlFor="left">
+          <strong>이미지가 왼편에, 텍스트는 오른편에 위치한 레이아웃</strong>
+        </label>
+      </Grid>
+      <Grid is_flex>
+        <Image
+          width="50%"
+          shape="half"
+          src={preview ? preview : "http://via.placeholder.com/400x300"}
+        />
+        <Text width="80%" margin="10px" center>
+          {contents}
+        </Text>
+      </Grid>
+
+      <Grid padding="16px">
+        <input
+          type="radio"
+          name="layout"
+          value="bottom"
+          id="bottom"
+          onChange={is_checked}
+          style={{ color: "skyblue" }}
+        />
+        <label htmlFor="bottom">
+          {" "}
+          <strong>텍스트가 위에, 이미지는 아래에 위치한 레이아웃</strong>
+        </label>
+      </Grid>
+      <Grid>
+        <Text margin="10px">{contents}</Text>
+        <Image
+          shape="half"
+          width="100%"
           src={preview ? preview : "http://via.placeholder.com/400x300"}
         />
       </Grid>
@@ -99,9 +160,17 @@ const PostWrite = (props) => {
 
       <Grid padding="16px">
         {is_edit ? (
-          <Button text="게시글 수정" _onClick={editPost}></Button>
+          <Button
+            text="게시글 수정"
+            _onClick={editPost}
+            _disabled={!preview || contents === "" ? true : false}
+          ></Button>
         ) : (
-          <Button text="게시글 작성" _onClick={addPost}></Button>
+          <Button
+            text="게시글 작성"
+            _onClick={addPost}
+            _disabled={!preview || contents === "" ? true : false}
+          ></Button>
         )}
       </Grid>
     </React.Fragment>

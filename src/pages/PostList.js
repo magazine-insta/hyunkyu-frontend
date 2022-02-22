@@ -15,7 +15,7 @@ const PostList = (props) => {
   const user_info = useSelector((state) => state.user.user);
   const is_loading = useSelector((state) => state.post.is_loading);
   const paging = useSelector((state) => state.post.paging);
-  console.log("user_info", user_info);
+
   const { history } = props;
 
   React.useEffect(() => {
@@ -40,7 +40,7 @@ const PostList = (props) => {
             if (p.user_info.user_id === user_info?.uid) {
               return (
                 <>
-                  {/* <Grid
+                  <Grid
                     bg="#ffffff"
                     margin="8px 0px"
                     key={p.id}
@@ -50,7 +50,7 @@ const PostList = (props) => {
                   >
                     <Post key={p.id} {...p} is_me />
                   </Grid>
-                  <Heart key={p.id} {...p}></Heart> */}
+                  <Heart></Heart>
                   {/* <Heart>asdasdad</Heart> */}
                   {/* <div style={{ flex: "right" }}>
                     <FontAwesomeIcon icon={faHeart} />
@@ -73,7 +73,7 @@ const PostList = (props) => {
                   >
                     <Post {...p} />
                   </Grid>
-
+                  <Heart></Heart>
                   {/* <div style={{ flex: "right" }}>
                     <FontAwesomeIcon icon={faHeart} />
                   </div>

@@ -41,6 +41,7 @@ const initialPost = {
   contents: "",
   comment_cnt: 10,
   insert_dt: moment().format("YYYY-MM-DD hh:mm:ss"),
+  layout: "bottom",
   is_like: false,
   like_cnt: 10,
 };
@@ -103,7 +104,7 @@ const editPostFB = (post_id = null, post = {}) => {
   };
 };
 
-const addPostFB = (contents = "") => {
+const addPostFB = (contents = "", layout) => {
   return function (dispatch, getState, { history }) {
     const postDB = firestore.collection("post");
 
@@ -117,14 +118,15 @@ const addPostFB = (contents = "") => {
 
     const _post = {
       ...initialPost,
+      layout: layout,
       contents: contents,
       insert_dt: moment().format("YYYY-MM-DD hh:mm:ss"),
     };
 
     const _image = getState().image.preview;
 
-    console.log(_image);
-    console.log(typeof _image);
+    // console.log(_image);
+    // console.log(typeof _image);
 
     const _upload = storage
       .ref(`images/${user_info.user_id}_${new Date().getTime()}`)

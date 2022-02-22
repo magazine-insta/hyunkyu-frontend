@@ -5,7 +5,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 const Post = (props) => {
-  // console.log("props------------", props.user_info.user_info.user_profile);
+  const {
+    user_info,
+    image_url,
+    contents,
+    like_cnt,
+    insert_dt,
+    id,
+    layout,
+    comment_cnt,
+  } = props;
+
   return (
     <React.Fragment>
       <Grid>
@@ -30,17 +40,54 @@ const Post = (props) => {
             <Text>{props.insert_dt}</Text>
           </Grid>
         </Grid>
-        <Grid padding="16px">
-          <Text>{props.contents}</Text>
-        </Grid>
-        <Grid>
-          <Image shape="rectangle" src={props.image_url} />
-        </Grid>
-        <Grid padding="16px" is_flex>
-          <Text margin="0px" bold>
-            댓글 {props.comment_cnt}개
-          </Text>
-        </Grid>
+        {layout === "right" && (
+          <>
+            <Grid is_flex>
+              <Text width="80%" margin="10px" center>
+                {contents}
+              </Text>
+              <Image width="50%" shape="half" src={image_url} />
+            </Grid>
+
+            <Grid padding="16px" is_flex>
+              <Text margin="0px" bold>
+                댓글 {props.comment_cnt}개
+              </Text>
+            </Grid>
+          </>
+        )}
+
+        {layout === "left" && (
+          <>
+            <Grid is_flex>
+              <Image width="50%" shape="half" src={image_url} />
+              <Text width="80%" margin="10px" center>
+                {contents}
+              </Text>
+            </Grid>
+
+            <Grid padding="16px" is_flex>
+              <Text margin="0px" bold>
+                댓글 {props.comment_cnt}개
+              </Text>
+            </Grid>
+          </>
+        )}
+
+        {layout === "bottom" && (
+          <>
+            <Grid>
+              <Text margin="10px">{contents}</Text>
+              <Image shape="half" width="100%" src={image_url} />
+            </Grid>
+
+            <Grid padding="16px" is_flex>
+              <Text margin="0px" bold>
+                댓글 {props.comment_cnt}개
+              </Text>
+            </Grid>
+          </>
+        )}
       </Grid>
     </React.Fragment>
   );
