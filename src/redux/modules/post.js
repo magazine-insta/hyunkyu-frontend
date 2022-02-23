@@ -3,13 +3,14 @@ import { produce } from "immer";
 import { firestore, storage } from "../../shared/firebase";
 import "moment";
 import moment from "moment";
-
+import { doc, deleteDoc } from "firebase/firestore";
 import { actionCreators as imageActions } from "./image";
 
 const SET_POST = "SET_POST";
 const ADD_POST = "ADD_POST";
 const EDIT_POST = "EDIT_POST";
 const LOADING = "LOADING";
+const DELETE_POST = "DELETE_POST";
 
 const setPost = createAction(SET_POST, (post_list, paging) => ({
   post_list,
@@ -20,6 +21,9 @@ const editPost = createAction(EDIT_POST, (post_id, post) => ({
   post_id,
   post,
 }));
+// const deletePost = createAction(DELETE_POST, (post_id) => ({
+//   post_id,
+// }));
 
 const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 
@@ -186,19 +190,12 @@ const getPostFB = (start = null, size = 3) => {
       query = query.startAt(start);
     }
 
-    // 사이즈보다 1개 더 크게 가져옵시다.
-    // 3개씩 끊어서 보여준다고 할 때, 4개를 가져올 수 있으면? 앗 다음 페이지가 있겠네하고 알 수 있으니까요.
-    // 만약 4개 미만이라면? 다음 페이지는 없겠죠! :)
     query
       .limit(size + 1)
       .get()
       .then((docs) => {
         let post_list = [];
 
-        // 새롭게 페이징 정보를 만들어줘요.
-        // 시작점에는 새로 가져온 정보의 시작점을 넣고,
-        // next에는 마지막 항목을 넣습니다.
-        // (이 next가 다음번 리스트 호출 때 start 파라미터로 넘어올거예요.)
         let paging = {
           start: docs.docs[0],
           next:
@@ -226,12 +223,7 @@ const getPostFB = (start = null, size = 3) => {
 
           post_list.push(post);
         });
-
-        // 마지막 하나는 빼줍니다.
-        // 그래야 size대로 리스트가 추가되니까요!
-        // 마지막 데이터는 다음 페이지의 유무를 알려주기 위한 친구일 뿐! 리스트에 들어가지 않아요!
         post_list.pop();
-
         dispatch(setPost(post_list, paging));
       });
   };
@@ -267,6 +259,16 @@ const getOnePostFB = (id) => {
       });
   };
 };
+
+// const deletePostFB = (id) => {
+//   return async function (dispatch, getState, { history }) {
+//     console.log(id);
+//     const postDB = firestore.collection("post");
+//     const _id = postDB.doc(id);
+//     console.log(_id);
+//     await deleteDoc(doc(postDB, id)).then(window.location.replace("/"));
+//   };
+// };
 export default handleActions(
   {
     [SET_POST]: (state, action) =>
@@ -302,6 +304,8 @@ export default handleActions(
 
         draft.list[idx] = { ...draft.list[idx], ...action.payload.post };
       }),
+    [DELETE_POST]: (state, action) => produce(state, (draft) => {}),
+
     [LOADING]: (state, action) =>
       produce(state, (draft) => {
         draft.is_loading = action.payload.is_loading;
@@ -318,6 +322,7 @@ const actionCreators = {
   addPostFB,
   editPostFB,
   getOnePostFB,
+  //   deletePostFB,
 };
 
 export { actionCreators };

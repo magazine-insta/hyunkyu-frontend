@@ -20,14 +20,13 @@ const PostList = (props) => {
 
   React.useEffect(() => {
     // 가지고 있는 데이터가 0개, 1개일 때만 새로 데이터를 호출해요.
-    if (post_list.length < 2) {
-      dispatch(postActions.getPostFB());
-    }
+
+    dispatch(postActions.getPostFB());
   }, []);
 
   return (
     <React.Fragment>
-      <Grid bg={"#EFF6FF"} padding="20px 0px">
+      <Grid bg={"#EFF6FF"} padding="20px 0px" width="" margin="0 auto">
         {/* <Post/> */}
         <InfinityScroll
           callNext={() => {

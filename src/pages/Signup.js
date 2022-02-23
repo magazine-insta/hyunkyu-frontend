@@ -3,6 +3,7 @@ import { Text, Input, Grid, Button } from "../elements";
 import { useDispatch } from "react-redux";
 import { actionCreators as userActions } from "../redux/modules/user";
 import { emailCheck } from "../shared/common";
+import axios from "axios";
 
 const Signup = (props) => {
   const dispatch = useDispatch();
@@ -28,6 +29,29 @@ const Signup = (props) => {
     }
 
     dispatch(userActions.signupFB(id, pwd, user_name, profile));
+  };
+
+  const signup2 = () => {
+    if (pwd !== pwd_check) {
+      window.alert("패스워드와 패스워드 확인이 일치하지 않습니다!");
+      return;
+    }
+    if (id === "" || pwd === "" || user_name === "" || profile === "") {
+      window.alert("아이디, 패스워드, 닉네임,프로필을 모두 입력해주세요!");
+      return;
+    }
+    if (!emailCheck(id)) {
+      window.alert("이메일 형식이 맞지 않습니다!");
+      return;
+    }
+
+    dispatch(userActions.signupFB2(id, pwd, user_name, profile));
+  };
+
+  const getapi = () => {
+    axios.get("http://13.209.40.211/api/post").then((res) => {
+      console.log(res);
+    });
   };
 
   return (
@@ -87,6 +111,10 @@ const Signup = (props) => {
         </Grid>
 
         <Button text="회원가입하기" _onClick={signup}></Button>
+        {/* <hr />
+        <Button text="api회원가입" _onClick={signup2}></Button>
+        <hr />
+        <Button text="데이터불러오기" _onClick={getapi}></Button> */}
       </Grid>
     </React.Fragment>
   );

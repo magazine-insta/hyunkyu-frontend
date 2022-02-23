@@ -10,7 +10,7 @@ const Button = (props) => {
     margin,
     width,
     padding,
-    _disabled,
+    _disAbled,
   } = props;
 
   if (is_float) {
@@ -29,7 +29,7 @@ const Button = (props) => {
 
   return (
     <React.Fragment>
-      <ElButton {...styles} onClick={_onClick} disabled={_disabled}>
+      <ElButton {...styles} onClick={_onClick} disabled={_disAbled}>
         {text ? text : children}
       </ElButton>
     </React.Fragment>
@@ -44,7 +44,7 @@ Button.defaultProps = {
   margin: false,
   width: "100%",
   padding: "12px 0px",
-  _disabled: false,
+  _disAbled: false,
 };
 
 const ElButton = styled.button`

@@ -12,6 +12,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth } from "../../shared/firebase";
+import axios from "axios";
 
 // actions
 const LOG_IN = "LOG_IN";
@@ -94,6 +95,22 @@ const loginFB = (id, pwd) => {
         const errorCode = error.code;
         const errorMessage = error.message;
       });
+  };
+};
+
+const signup2FB = (id, pwd, user_name, profile) => {
+  return async function (dispatch, getState, { history }) {
+    await axios({
+      method: "post",
+      url: "http://13.209.40.211/user/signup",
+      data: {
+        userEmail: id,
+        password: pwd,
+        nickname: user_name,
+      },
+    }).then((res) => {
+      console.log(res);
+    });
   };
 };
 
@@ -207,6 +224,7 @@ const actionCreators = {
   signupFB,
   loginCheckFB,
   logoutFB,
+  signup2FB,
   //   loginAction,
 };
 export { actionCreators };

@@ -1,10 +1,11 @@
 import React from "react";
 import { Grid, Image, Text, Button } from "../elements";
 import { history } from "../redux/configureStore";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { actionCreators as postActions } from "../redux/modules/post";
+import { useDispatch } from "react-redux";
 
 const Post = (props) => {
+  const dispatch = useDispatch();
   const {
     user_info,
     image_url,
@@ -26,16 +27,19 @@ const Post = (props) => {
           </Grid>
           <Grid is_flex width="auto">
             {props.is_me && (
-              <Button
-                width="auto"
-                padding="4px"
-                margin="4px"
-                _onClick={() => {
-                  history.push(`/write/${props.id}`);
-                }}
-              >
-                수정
-              </Button>
+              <>
+                {" "}
+                <Button
+                  width="auto"
+                  padding="4px"
+                  margin="4px"
+                  _onClick={() => {
+                    history.push(`/write/${props.id}`);
+                  }}
+                >
+                  수정
+                </Button>{" "}
+              </>
             )}
             <Text>{props.insert_dt}</Text>
           </Grid>
