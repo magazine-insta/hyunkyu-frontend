@@ -23,6 +23,9 @@ const Login = (props) => {
     }
     dispatch(userActions.loginFB(id, pwd));
   };
+  const login2 = () => {
+    dispatch(userActions.loginFB2(id, pwd));
+  };
 
   // const onSubmitHandler = (e)=>{
   //   e.preventDefault();
@@ -61,6 +64,8 @@ const Login = (props) => {
         </Grid>
 
         <Button _onClick={login}>로그인</Button>
+        <hr />
+        <Button _onClick={login2}>API로그인</Button>
       </Grid>
     </React.Fragment>
   );

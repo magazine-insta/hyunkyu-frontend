@@ -19,12 +19,13 @@ const LOG_IN = "LOG_IN";
 const LOG_OUT = "LOG_OUT";
 const GET_USER = "GET_USER";
 const SET_USER = "SET_USER";
-
+const SET_USER2 = "SET_USER2";
 // action creators
 const logIn = createAction(LOG_IN, (user) => ({ user }));
 const logOut = createAction(LOG_OUT, (user) => ({ user }));
 const getUser = createAction(GET_USER, (user) => ({ user }));
 const setUser = createAction(SET_USER, (user) => ({ user }));
+const setUser2 = createAction(SET_USER2, (user) => ({ user }));
 
 //initialState
 const initialState = {
@@ -45,6 +46,39 @@ const user_initial = {
 //     history.push("/");
 //   };
 // };
+
+const loginFB2 = (id, pwd) => {
+  return function (dispatch, getState, { history }) {
+    const data = {
+      username: id,
+      password: pwd,
+    };
+    axios
+      .post(
+        "http://13.209.40.211/api/login",
+        data,
+
+        { withCredentials: true }
+      )
+      .then((res) => {
+        // const user = userCredential.user;
+        // console.log(user.displayName);
+        const accessToken = res.data.token;
+        setCookie("is_login", `${accessToken}`);
+        dispatch(
+          setUser2({
+            id: res.data.username,
+            pwd: res.password,
+            user_name: res.data.nickname,
+          })
+        );
+
+        history.push("/");
+        console.log("success", res.data.token);
+      })
+      .catch((err) => console.log("getPostFB::: ", err.message));
+  };
+};
 
 const loginFB = (id, pwd) => {
   return function (dispatch, getState, { history }) {
@@ -69,6 +103,7 @@ const loginFB = (id, pwd) => {
               })
             );
             history.push("/");
+            // window.location.replace("/");
             // ...
           })
           .catch((error) => {
@@ -99,18 +134,23 @@ const loginFB = (id, pwd) => {
 };
 
 const signup2FB = (id, pwd, user_name, profile) => {
-  return async function (dispatch, getState, { history }) {
-    await axios({
+  return function (dispatch, getState, { history }) {
+    axios({
       method: "post",
-      url: "http://13.209.40.211/user/signup",
+      url: "http://13.209.40.211/api/signup",
       data: {
-        userEmail: id,
+        username: id,
         password: pwd,
         nickname: user_name,
       },
-    }).then((res) => {
-      console.log(res);
-    });
+      withCredentials: true,
+    })
+      .then((res) => {
+        window.alert(res.data.username);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 };
 
@@ -146,6 +186,38 @@ const signupFB = (id, pwd, user_name, profile) => {
 
         console.log("signupFB error" + errorCode, errorMessage);
         // ..
+      });
+  };
+};
+
+const loginCheckFB2 = (token) => {
+  return async function (dispatch, getState) {
+    // const token = getCookie("is_login");
+    console.log("loginCheckFB2", token);
+    console.log();
+    await axios
+      .get(
+        "http://13.209.40.211/api/user",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+        // { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then((res) => {
+        console.log("check----------", res);
+        dispatch(
+          setUser2({
+            id: res.data.userEmail,
+            user_name: res.data.nickname,
+            uid: "",
+            user_profile: "",
+          })
+        );
+      })
+      .catch((error) => {
+        console.log(error.code, error.message);
       });
   };
 };
@@ -203,6 +275,13 @@ export default handleActions(
         draft.user = action.payload.user;
         draft.is_login = true;
       }),
+    [SET_USER2]: (state, action) =>
+      produce(state, (draft) => {
+        draft.user = action.payload.user;
+        console.log(draft.user);
+        draft.is_login = true;
+      }),
+
     [LOG_OUT]: (state, action) =>
       produce(state, (draft) => {
         deleteCookie("is_login");
@@ -225,6 +304,8 @@ const actionCreators = {
   loginCheckFB,
   logoutFB,
   signup2FB,
+  loginFB2,
+  loginCheckFB2,
   //   loginAction,
 };
 export { actionCreators };

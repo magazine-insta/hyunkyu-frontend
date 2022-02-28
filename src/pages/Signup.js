@@ -19,7 +19,7 @@ const Signup = (props) => {
       window.alert("패스워드와 패스워드 확인이 일치하지 않습니다!");
       return;
     }
-    if (id === "" || pwd === "" || user_name === "" || profile === "") {
+    if (id === "" || pwd === "" || user_name === "") {
       window.alert("아이디, 패스워드, 닉네임,프로필을 모두 입력해주세요!");
       return;
     }
@@ -36,7 +36,7 @@ const Signup = (props) => {
       window.alert("패스워드와 패스워드 확인이 일치하지 않습니다!");
       return;
     }
-    if (id === "" || pwd === "" || user_name === "" || profile === "") {
+    if (id === "" || pwd === "" || user_name === "") {
       window.alert("아이디, 패스워드, 닉네임,프로필을 모두 입력해주세요!");
       return;
     }
@@ -45,7 +45,7 @@ const Signup = (props) => {
       return;
     }
 
-    dispatch(userActions.signupFB2(id, pwd, user_name, profile));
+    dispatch(userActions.signup2FB(id, pwd, user_name));
   };
 
   const getapi = () => {
@@ -111,10 +111,10 @@ const Signup = (props) => {
         </Grid>
 
         <Button text="회원가입하기" _onClick={signup}></Button>
-        {/* <hr />
+        <hr />
         <Button text="api회원가입" _onClick={signup2}></Button>
         <hr />
-        <Button text="데이터불러오기" _onClick={getapi}></Button> */}
+        <Button text="데이터불러오기" _onClick={getapi}></Button>
       </Grid>
     </React.Fragment>
   );

@@ -19,20 +19,27 @@ import { apiKey } from "./firebase";
 
 import { useDispatch } from "react-redux";
 import { actionCreators as userActions } from "../redux/modules/user";
-
+import { getCookie } from "./Cookies";
 import Permit from "./Permit";
 
 function App() {
   const dispatch = useDispatch();
 
   const _session_key = `firebase:authUser:${apiKey}:[DEFAULT]`;
-  const is_session = sessionStorage.getItem(_session_key) ? true : false;
-
+  // const is_session = sessionStorage.getItem(token) ? true : false;
+  // const token = getCookie("is_login");
+  // console.log(token);
+  // const is_token = cookies.getItem(token) ? true : false;
   React.useEffect(() => {
-    if (is_session) {
-      dispatch(userActions.loginCheckFB());
+    const token = getCookie("is_login");
+    console.log(token);
+    // if (is_session) {
+    //   dispatch(userActions.loginCheckFB());
+    // }
+    if (token) {
+      dispatch(userActions.loginCheckFB2(token));
     }
-  }, []);
+  });
 
   return (
     <React.Fragment>

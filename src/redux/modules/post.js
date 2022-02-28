@@ -21,9 +21,9 @@ const editPost = createAction(EDIT_POST, (post_id, post) => ({
   post_id,
   post,
 }));
-// const deletePost = createAction(DELETE_POST, (post_id) => ({
-//   post_id,
-// }));
+const deletePost = createAction(DELETE_POST, (post_id) => ({
+  post_id,
+}));
 
 const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 
@@ -260,15 +260,15 @@ const getOnePostFB = (id) => {
   };
 };
 
-// const deletePostFB = (id) => {
-//   return async function (dispatch, getState, { history }) {
-//     console.log(id);
-//     const postDB = firestore.collection("post");
-//     const _id = postDB.doc(id);
-//     console.log(_id);
-//     await deleteDoc(doc(postDB, id)).then(window.location.replace("/"));
-//   };
-// };
+const deletePostFB = (id) => {
+  return async function (dispatch, getState, { history }) {
+    console.log(id);
+    const postDB = firestore.collection("post");
+    const _id = postDB.doc(id);
+    console.log(_id);
+    await deleteDoc(doc(postDB, id)).then(window.location.replace("/"));
+  };
+};
 export default handleActions(
   {
     [SET_POST]: (state, action) =>
@@ -322,7 +322,7 @@ const actionCreators = {
   addPostFB,
   editPostFB,
   getOnePostFB,
-  //   deletePostFB,
+  deletePostFB,
 };
 
 export { actionCreators };

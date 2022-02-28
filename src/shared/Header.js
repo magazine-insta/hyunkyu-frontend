@@ -10,6 +10,7 @@ import Permit from "./Permit";
 const Header = (props) => {
   const dispatch = useDispatch();
   const is_login = useSelector((state) => state.user.is_login);
+  console.log(is_login);
 
   const _session_key = `firebase:authUser:${apiKey}:[DEFAULT]`;
 
@@ -39,7 +40,7 @@ const Header = (props) => {
   //     </Grid>
   //   </React.Fragment>
   // </Permit>;
-  if (is_login && is_session) {
+  if (is_login) {
     return (
       <React.Fragment>
         <Grid is_flex>
