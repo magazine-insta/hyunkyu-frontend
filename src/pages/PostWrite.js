@@ -11,28 +11,30 @@ const PostWrite = (props) => {
   const is_login = useSelector((state) => state.user.is_login);
   const preview = useSelector((state) => state.image.preview);
   const post_list = useSelector((state) => state.post.list);
-
+  console.log("post_list-------", post_list);
   const post_id = props.match.params.id;
-
-  const is_edit = post_id ? true : false;
-
+  console.log("post_id----------2", typeof post_id);
+  const is_edit = parseInt(post_id) ? true : false;
+  console.log("is_edit----------2", is_edit);
   const { history } = props;
 
-  let _post = is_edit ? post_list.find((p) => p.id === post_id) : null;
-
+  let _post = is_edit
+    ? post_list.find((p) => p.postId === parseInt(post_id))
+    : null;
+  console.log(_post);
   const [contents, setContents] = React.useState(_post ? _post.contents : "");
   const [layout, setLayout] = useState(_post ? _post.layout : "bottom");
 
   React.useEffect(() => {
-    if (is_edit && !_post) {
-      console.log("포스트 정보가 없어요!");
-      history.goBack();
+    // if (is_edit && !_post) {
+    //   console.log("포스트 정보가 없어요!");
+    //   //   history.goBack();
 
-      return;
-    }
+    //   return;
+    // }
 
     if (is_edit) {
-      dispatch(imageActions.setPreview(_post.image_url));
+      dispatch(imageActions.setPreview(_post.imageURL));
     }
   }, []);
 
@@ -41,7 +43,7 @@ const PostWrite = (props) => {
   };
 
   const addPost = () => {
-    dispatch(postActions.addPostFB(contents, layout));
+    dispatch(postActions.addPostFB2(contents, layout));
   };
 
   const editPost = () => {
@@ -83,7 +85,7 @@ const PostWrite = (props) => {
         <input
           type="radio"
           name="layout"
-          value="right"
+          value="RIGHT"
           id="right"
           onChange={is_checked}
         />
@@ -106,7 +108,7 @@ const PostWrite = (props) => {
         <input
           type="radio"
           name="layout"
-          value="left"
+          value="LEFT"
           id="left"
           onChange={is_checked}
         />
@@ -129,7 +131,7 @@ const PostWrite = (props) => {
         <input
           type="radio"
           name="layout"
-          value="bottom"
+          value="BOTTOM"
           id="bottom"
           onChange={is_checked}
           style={{ color: "skyblue" }}

@@ -3,55 +3,29 @@ import { Text, Input, Grid, Button } from "../elements";
 import { useDispatch } from "react-redux";
 import { actionCreators as userActions } from "../redux/modules/user";
 import { emailCheck } from "../shared/common";
-import axios from "axios";
 
 const Signup = (props) => {
   const dispatch = useDispatch();
 
-  const [id, setId] = useState("");
-  const [pwd, setPwd] = useState("");
-  const [pwd_check, setPwdCheck] = useState("");
-  const [user_name, setUserName] = useState("");
-  const [profile, setProfile] = useState("");
+  const [username, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordCheck, setPasswordCheck] = useState("");
+  const [nickname, setNickName] = useState("");
 
   const signup = () => {
-    if (pwd !== pwd_check) {
+    if (password !== passwordCheck) {
       window.alert("패스워드와 패스워드 확인이 일치하지 않습니다!");
       return;
     }
-    if (id === "" || pwd === "" || user_name === "") {
+    if (username === "" || password === "" || nickname === "") {
       window.alert("아이디, 패스워드, 닉네임,프로필을 모두 입력해주세요!");
       return;
     }
-    if (!emailCheck(id)) {
+    if (!emailCheck(username)) {
       window.alert("이메일 형식이 맞지 않습니다!");
       return;
     }
-
-    dispatch(userActions.signupFB(id, pwd, user_name, profile));
-  };
-
-  const signup2 = () => {
-    if (pwd !== pwd_check) {
-      window.alert("패스워드와 패스워드 확인이 일치하지 않습니다!");
-      return;
-    }
-    if (id === "" || pwd === "" || user_name === "") {
-      window.alert("아이디, 패스워드, 닉네임,프로필을 모두 입력해주세요!");
-      return;
-    }
-    if (!emailCheck(id)) {
-      window.alert("이메일 형식이 맞지 않습니다!");
-      return;
-    }
-
-    dispatch(userActions.signup2FB(id, pwd, user_name));
-  };
-
-  const getapi = () => {
-    axios.get("http://13.209.40.211/api/post").then((res) => {
-      console.log(res);
-    });
+    dispatch(userActions.signup(username, password, nickname));
   };
 
   return (
@@ -67,7 +41,7 @@ const Signup = (props) => {
             label="아이디"
             placeholder="아이디를 입력해주세요"
             _onChange={(e) => {
-              setId(e.target.value);
+              setUserName(e.target.value);
             }}
           ></Input>
         </Grid>
@@ -76,16 +50,7 @@ const Signup = (props) => {
             label="닉네임"
             placeholder="닉네임을 입력해주세요"
             _onChange={(e) => {
-              setUserName(e.target.value);
-            }}
-          ></Input>
-        </Grid>
-        <Grid padding="16px 0px">
-          <Input
-            label="프로필"
-            placeholder="프로필 주소를 입력해주세요"
-            _onChange={(e) => {
-              setProfile(e.target.value);
+              setNickName(e.target.value);
             }}
           ></Input>
         </Grid>
@@ -95,7 +60,7 @@ const Signup = (props) => {
             label="비밀번호"
             placeholder="비밀번호를 입력해주세요"
             _onChange={(e) => {
-              setPwd(e.target.value);
+              setPassword(e.target.value);
             }}
           ></Input>
         </Grid>
@@ -105,16 +70,12 @@ const Signup = (props) => {
             label="비밀번호 확인"
             placeholder="비밀번호를 다시 입력해주세요"
             _onChange={(e) => {
-              setPwdCheck(e.target.value);
+              setPasswordCheck(e.target.value);
             }}
           ></Input>
         </Grid>
 
         <Button text="회원가입하기" _onClick={signup}></Button>
-        <hr />
-        <Button text="api회원가입" _onClick={signup2}></Button>
-        <hr />
-        <Button text="데이터불러오기" _onClick={getapi}></Button>
       </Grid>
     </React.Fragment>
   );

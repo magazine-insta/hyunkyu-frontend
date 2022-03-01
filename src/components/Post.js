@@ -1,21 +1,9 @@
 import React from "react";
 import { Grid, Image, Text, Button } from "../elements";
 import { history } from "../redux/configureStore";
-import { actionCreators as postActions } from "../redux/modules/post";
-import { useDispatch } from "react-redux";
 
 const Post = (props) => {
-  const dispatch = useDispatch();
-  const {
-    user_info,
-    image_url,
-    contents,
-    like_cnt,
-    insert_dt,
-    id,
-    layout,
-    comment_cnt,
-  } = props;
+  const { layoutType } = props;
 
   return (
     <React.Fragment>
@@ -23,7 +11,7 @@ const Post = (props) => {
         <Grid is_flex padding="16px">
           <Grid is_flex width="auto">
             <Image shape="circle" src={props.src} />
-            <Text bold>{props.user_info.user_name}</Text>
+            <Text bold>{props.nickname}</Text>
           </Grid>
           <Grid is_flex width="auto">
             {props.is_me && (
@@ -34,23 +22,24 @@ const Post = (props) => {
                   padding="4px"
                   margin="4px"
                   _onClick={() => {
-                    history.push(`/write/${props.id}`);
+                    // window.location.replace(`/write/${props.postId}`);
+                    history.push(`/write/${props.postId}`);
                   }}
                 >
                   수정
                 </Button>{" "}
               </>
             )}
-            <Text>{props.insert_dt}</Text>
+            <Text>{props.createdAt}</Text>
           </Grid>
         </Grid>
-        {layout === "right" && (
+        {layoutType === "RIGHT" && (
           <>
             <Grid is_flex>
               <Text width="80%" margin="10px" center>
-                {contents}
+                {props.contents}
               </Text>
-              <Image width="50%" shape="half" src={image_url} />
+              <Image width="50%" shape="half" src={props.imageUrl} />
             </Grid>
 
             <Grid padding="16px" is_flex>
@@ -61,12 +50,12 @@ const Post = (props) => {
           </>
         )}
 
-        {layout === "left" && (
+        {layoutType === "LEFT" && (
           <>
             <Grid is_flex>
-              <Image width="50%" shape="half" src={image_url} />
+              <Image width="50%" shape="half" src={props.imageUrl} />
               <Text width="80%" margin="10px" center>
-                {contents}
+                {props.contents}
               </Text>
             </Grid>
 
@@ -78,11 +67,11 @@ const Post = (props) => {
           </>
         )}
 
-        {layout === "bottom" && (
+        {layoutType === "BOTTOM" && (
           <>
             <Grid>
-              <Text margin="10px">{contents}</Text>
-              <Image shape="half" width="100%" src={image_url} />
+              <Text margin="10px">{props.contents}</Text>
+              <Image shape="half" width="100%" src={props.imageUrl} />
             </Grid>
 
             <Grid padding="16px" is_flex>

@@ -9,33 +9,39 @@ import { useSelector, useDispatch } from "react-redux";
 import { actionCreators as postActions } from "../redux/modules/post";
 
 const PostDetail = (props) => {
+  //   console.log(props);
   const dispatch = useDispatch();
   const id = props.match.params.id;
-
+  //   console.log("id", id);
   const user_info = useSelector((state) => state.user.user);
 
   const post_list = useSelector((store) => store.post.list);
+  //   console.log("post_list", post_list[0]);
+  let post_idx;
+  //   console.log("post_idx", post_idx);
+  post_list.map((p, num) => {
+    // console.log(p.postId, id);
+    if (p.postId === parseInt(id)) {
+      post_idx = num;
+    }
+  });
 
-  const post_idx = post_list.findIndex((p) => p.id === id);
   const post = post_list[post_idx];
-  console.log(post);
+
+  //   console.log("post2----------", post);
   const deletePost = () => {
     dispatch(postActions.deletePostFB(id));
   };
 
   React.useEffect(() => {
-    if (post) {
-      return;
-    }
+    // console.log("post", post);
 
-    dispatch(postActions.getOnePostFB(id));
-  }, []);
+    dispatch(postActions.getOnePostFB2(id));
+  }, [dispatch]);
 
   return (
     <React.Fragment>
-      {post && (
-        <Post {...post} is_me={post.user_info.user_id === user_info?.uid} />
-      )}
+      {post && <Post {...post} />}
       <Button width="auto" padding="4px" margin="4px" _onClick={deletePost}>
         삭제
       </Button>

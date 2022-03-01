@@ -1,21 +1,23 @@
 import { createAction, handleActions } from "redux-actions";
 import { produce } from "immer";
 import { firestore, storage } from "../../shared/firebase";
-import "moment";
 import moment from "moment";
 import { doc, deleteDoc } from "firebase/firestore";
 import { actionCreators as imageActions } from "./image";
+import axios from "axios";
+import { getCookie } from "../../shared/Cookies";
 
-const SET_POST = "SET_POST";
+const GET_POST = "SET_POST";
 const ADD_POST = "ADD_POST";
 const EDIT_POST = "EDIT_POST";
 const LOADING = "LOADING";
 const DELETE_POST = "DELETE_POST";
 
-const setPost = createAction(SET_POST, (post_list, paging) => ({
+const getPost = createAction(GET_POST, (post_list, paging) => ({
   post_list,
   paging,
 }));
+
 const addPost = createAction(ADD_POST, (post) => ({ post }));
 const editPost = createAction(EDIT_POST, (post_id, post) => ({
   post_id,
@@ -29,9 +31,11 @@ const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 
 const initialState = {
   list: [],
-  paging: { start: null, next: null, size: 3 },
+  paging: { start: 0, next: true, size: 3 },
   is_loading: false,
 };
+const baseURL = "http://13.209.40.211/api/post";
+const token = getCookie("is_login");
 
 const initialPost = {
   //   id: 0,
@@ -40,16 +44,79 @@ const initialPost = {
   //     user_profile:
   //       "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2043&q=80",
   //   },
-  image_url:
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2043&q=80",
   contents: "",
   comment_cnt: 10,
-  insert_dt: moment().format("YYYY-MM-DD hh:mm:ss"),
-  layout: "bottom",
-  is_like: false,
-  like_cnt: 10,
+  imageUrl: "",
+  layoutType: "BOTTOM",
 };
+const editPostFB2 = (post_id = null, post = {}) => {
+  return function (dispatch, getState, { history }) {
+    if (!post_id) {
+      console.log("게시물 정보가 없어요!");
+      return;
+    }
 
+    const _image = getState().image.preview;
+    const _post_idx = getState().post.list.findIndex((p) => p.id === post_id);
+    const _post = getState().post.list[_post_idx];
+    console.log(_post);
+    const editPostData = {
+      ...post,
+      postId: post_id,
+      imageUrl: _post.imageUrl,
+    };
+    console.log(editPostData);
+
+    if (_image === _post.imageUrl) {
+      axios
+        .post(`api/post/${post_id}`, editPostData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        })
+        .then((res) => {
+          history.replace("/");
+          dispatch(editPost(post_id, editPostData));
+        })
+        .catch((err) => console.log("updatePost: ", err.response));
+      return;
+    } else {
+      const _upload = storage
+        .ref(`images/${post_id}_${new Date().getTime()}`)
+        .putString(_image, "data_url");
+      _upload.then((snapshot) => {
+        snapshot.ref
+          .getDownloadURL()
+          .then((url) => {
+            console.log(url);
+            return url;
+          })
+          .then((url) => {
+            axios
+              .post(
+                `api/post/${post_id}`,
+                { ...post, imageUrl: url },
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                  withCredentials: true,
+                }
+              )
+              .then(() => {
+                history.replace("/");
+                dispatch(editPost(post_id, { ...post, imageUrl: url }));
+              })
+              .catch((err) => console.log(" ", err.code, err.message));
+          })
+          .catch((err) => {
+            console.log("앗! 이미지 업로드에 문제가 있어요!", err.message);
+          });
+      });
+    }
+  };
+};
 const editPostFB = (post_id = null, post = {}) => {
   return function (dispatch, getState, { history }) {
     if (!post_id) {
@@ -107,24 +174,20 @@ const editPostFB = (post_id = null, post = {}) => {
     }
   };
 };
-
-const addPostFB = (contents = "", layout) => {
+const addPostFB2 = (contents = "", layout) => {
   return function (dispatch, getState, { history }) {
-    const postDB = firestore.collection("post");
+    // const postDB2 = firestore.collection("post2");
 
     const _user = getState().user.user;
 
     const user_info = {
-      user_name: _user.user_name,
-      user_id: _user.uid,
-      user_profile: _user.user_profile,
+      nickname: _user.nickname,
     };
 
     const _post = {
       ...initialPost,
-      layout: layout,
+      layoutType: layout,
       contents: contents,
-      insert_dt: moment().format("YYYY-MM-DD hh:mm:ss"),
     };
 
     const _image = getState().image.preview;
@@ -133,7 +196,7 @@ const addPostFB = (contents = "", layout) => {
     // console.log(typeof _image);
 
     const _upload = storage
-      .ref(`images/${user_info.user_id}_${new Date().getTime()}`)
+      .ref(`images/${user_info.nickname}_${new Date().getTime()}`)
       .putString(_image, "data_url");
 
     _upload.then((snapshot) => {
@@ -141,17 +204,25 @@ const addPostFB = (contents = "", layout) => {
         .getDownloadURL()
         .then((url) => {
           //   console.log(url);
+          //   postDB2.add({ imageURL: url });
 
+          dispatch(imageActions.uploadImage(url));
           return url;
         })
         .then((url) => {
-          postDB
-            .add({ ...user_info, ..._post, image_url: url })
-            .then((doc) => {
-              let post = { user_info, ..._post, id: doc.id, image_url: url };
-              dispatch(addPost(post));
-              history.replace("/");
+          const postData = { ..._post, imageUrl: url };
 
+          axios
+            .post(baseURL, postData, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              withCredentials: true,
+            })
+            .then((res) => {
+              //   history.replace("/");
+              window.location.replace("/");
+              dispatch(addPost(res.data));
               dispatch(imageActions.setPreview(null));
             })
             .catch((err) => {
@@ -167,95 +238,45 @@ const addPostFB = (contents = "", layout) => {
   };
 };
 
-const getPostFB = (start = null, size = 3) => {
+const getPostList = (start = 1, size = 3) => {
   return function (dispatch, getState, { history }) {
-    // state에서 페이징 정보 가져오기
     let _paging = getState().post.paging;
-
-    // 시작정보가 기록되었는데 다음 가져올 데이터가 없다면? 앗, 리스트가 끝났겠네요!
-    // 그럼 아무것도 하지말고 return을 해야죠!
     if (_paging.start && !_paging.next) {
       return;
     }
-
-    // 가져오기 시작~!
     dispatch(loading(true));
+    axios
+      .get(baseURL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      })
+      .then((docss) => {
+        // console.log(docss.data);
+        let docs = docss.data;
 
-    const postDB = firestore.collection("post");
-
-    let query = postDB.orderBy("insert_dt", "desc");
-
-    // 시작점 정보가 있으면? 시작점부터 가져오도록 쿼리 수정!
-    if (start) {
-      query = query.startAt(start);
-    }
-
-    query
-      .limit(size + 1)
-      .get()
-      .then((docs) => {
-        let post_list = [];
-
-        let paging = {
-          start: docs.docs[0],
-          next:
-            docs.docs.length === size + 1
-              ? docs.docs[docs.docs.length - 1]
-              : null,
-          size: size,
-        };
-
-        docs.forEach((doc) => {
-          let _post = doc.data();
-
-          let post = Object.keys(_post).reduce(
-            (acc, cur) => {
-              if (cur.indexOf("user_") !== -1) {
-                return {
-                  ...acc,
-                  user_info: { ...acc.user_info, [cur]: _post[cur] },
-                };
-              }
-              return { ...acc, [cur]: _post[cur] };
-            },
-            { id: doc.id, user_info: {} }
-          );
-
-          post_list.push(post);
-        });
-        post_list.pop();
-        dispatch(setPost(post_list, paging));
+        dispatch(getPost(docs));
       });
   };
 };
 
-const getOnePostFB = (id) => {
+const getOnePostFB2 = (id) => {
   return function (dispatch, getState, { history }) {
-    const postDB = firestore.collection("post");
-    postDB
-      .doc(id)
-      .get()
-      .then((doc) => {
-        let _post = doc.data();
-
-        if (!_post) {
-          return;
-        }
-
-        let post = Object.keys(_post).reduce(
-          (acc, cur) => {
-            if (cur.indexOf("user_") !== -1) {
-              return {
-                ...acc,
-                user_info: { ...acc.user_info, [cur]: _post[cur] },
-              };
-            }
-            return { ...acc, [cur]: _post[cur] };
-          },
-          { id: doc.id, user_info: {} }
-        );
-
-        dispatch(setPost([post], { start: null, next: null, size: 3 }));
+    console.log("id-------", id);
+    axios
+      .get(`/api/post/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      })
+      .then((res) => {
+        history.replace(`/post/${id}`);
+        dispatch(getPost(res.data));
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
 };
@@ -271,33 +292,16 @@ const deletePostFB = (id) => {
 };
 export default handleActions(
   {
-    [SET_POST]: (state, action) =>
+    [GET_POST]: (state, action) =>
       produce(state, (draft) => {
         draft.list.push(...action.payload.post_list);
-
-        // post_id가 같은 중복 항목을 제거합시다! :)
-        draft.list = draft.list.reduce((acc, cur) => {
-          // findIndex로 누산값(cur)에 현재값이 이미 들어있나 확인해요!
-          // 있으면? 덮어쓰고, 없으면? 넣어주기!
-          if (acc.findIndex((a) => a.id === cur.id) === -1) {
-            return [...acc, cur];
-          } else {
-            acc[acc.findIndex((a) => a.id === cur.id)] = cur;
-            return acc;
-          }
-        }, []);
-
-        // paging이 있을 때만 넣기
-        if (action.payload.paging) {
-          draft.paging = action.payload.paging;
-        }
-        draft.is_loading = false;
       }),
 
     [ADD_POST]: (state, action) =>
       produce(state, (draft) => {
         draft.list.unshift(action.payload.post);
       }),
+
     [EDIT_POST]: (state, action) =>
       produce(state, (draft) => {
         let idx = draft.list.findIndex((p) => p.id === action.payload.post_id);
@@ -315,14 +319,15 @@ export default handleActions(
 );
 
 const actionCreators = {
-  setPost,
   addPost,
+  addPostFB2,
+  getPost,
+  getPostList,
   editPost,
-  getPostFB,
-  addPostFB,
+  editPostFB2,
   editPostFB,
-  getOnePostFB,
   deletePostFB,
+  getOnePostFB2,
 };
 
 export { actionCreators };

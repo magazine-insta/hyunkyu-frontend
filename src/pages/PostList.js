@@ -15,13 +15,15 @@ const PostList = (props) => {
   const user_info = useSelector((state) => state.user.user);
   const is_loading = useSelector((state) => state.post.is_loading);
   const paging = useSelector((state) => state.post.paging);
-
+  // console.log("user_info", user_info);
   const { history } = props;
 
   React.useEffect(() => {
     // 가지고 있는 데이터가 0개, 1개일 때만 새로 데이터를 호출해요.
 
-    dispatch(postActions.getPostFB());
+    // dispatch(postActions.getPostFB());
+    dispatch(postActions.getPostList());
+    // console.log("post_list2--------", post_list);
   }, []);
 
   return (
@@ -30,55 +32,44 @@ const PostList = (props) => {
         {/* <Post/> */}
         <InfinityScroll
           callNext={() => {
-            dispatch(postActions.getPostFB(paging.next));
+            // dispatch(postActions.getPostFB(paging.next));
+            dispatch(postActions.getPost(paging.next));
           }}
           is_next={paging.next ? true : false}
           loading={is_loading}
         >
           {post_list.map((p, idx) => {
-            if (p.user_info.user_id === user_info?.uid) {
+            // console.log("p-----------", p.nickname);
+
+            if (p.nickname === user_info?.user_name) {
               return (
                 <>
                   <Grid
                     bg="#ffffff"
                     margin="8px 0px"
-                    key={p.id}
+                    key={p.postId}
                     _onClick={() => {
-                      history.push(`/post/${p.id}`);
+                      history.push(`/post/${p.postId}`);
                     }}
                   >
                     <Post key={p.id} {...p} is_me />
                   </Grid>
                   <Heart></Heart>
-                  {/* <Heart>asdasdad</Heart> */}
-                  {/* <div style={{ flex: "right" }}>
-                    <FontAwesomeIcon icon={faHeart} />
-                  </div>
-
-                  <Text margin="0px" bold>
-                    하트 {props.comment_cnt}개
-                  </Text> */}
                 </>
               );
             } else {
               return (
                 <>
                   <Grid
-                    key={p.id}
+                    key={p.postId}
                     bg="#ffffff"
                     _onClick={() => {
-                      history.push(`/post/${p.id}`);
+                      history.push(`/post/${p.postId}`);
                     }}
                   >
                     <Post {...p} />
                   </Grid>
                   <Heart></Heart>
-                  {/* <div style={{ flex: "right" }}>
-                    <FontAwesomeIcon icon={faHeart} />
-                  </div>
-                  <Text margin="0px" bold>
-                    하트 {props.comment_cnt}개
-                  </Text> */}
                 </>
               );
             }
