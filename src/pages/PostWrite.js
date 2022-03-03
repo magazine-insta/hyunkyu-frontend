@@ -11,11 +11,11 @@ const PostWrite = (props) => {
   const is_login = useSelector((state) => state.user.is_login);
   const preview = useSelector((state) => state.image.preview);
   const post_list = useSelector((state) => state.post.list);
-  console.log("post_list-------", post_list);
+  // console.log("post_list-------", post_list);
   const post_id = props.match.params.id;
-  console.log("post_id----------2", typeof post_id);
+  // console.log("post_id----------2", typeof post_id);
   const is_edit = parseInt(post_id) ? true : false;
-  console.log("is_edit----------2", is_edit);
+  // console.log("is_edit----------2", is_edit);
   const { history } = props;
 
   let _post = is_edit

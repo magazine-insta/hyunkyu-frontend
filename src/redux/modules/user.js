@@ -34,7 +34,7 @@ const login = (username, password) => {
         // const user = userCredential.user;
         // console.log(user.displayName);
         const accessToken = res.data.token;
-        console.log("accessToken-------", accessToken);
+        // console.log("accessToken-------", accessToken);
         setCookie("is_login", `${accessToken}`);
         dispatch(
           logIn({
@@ -70,8 +70,8 @@ const signup = (username, password, nickname) => {
 const loginCheck = (token) => {
   return async function (dispatch, getState) {
     // const token = getCookie("is_login");
-    console.log("loginCheckFB2", token);
-    console.log();
+    // console.log("loginCheckFB2", token);
+
     instance
       .get("/api/user", {
         headers: {

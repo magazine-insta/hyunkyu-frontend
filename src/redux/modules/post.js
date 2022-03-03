@@ -263,7 +263,7 @@ const getPostList = (start = 1, size = 3) => {
 
 const getOnePostFB2 = (id) => {
   return function (dispatch, getState, { history }) {
-    console.log("id-------", id);
+    // console.log("id-------", id);
     axios
       .get(`/api/post/${id}`, {
         headers: {
@@ -283,10 +283,10 @@ const getOnePostFB2 = (id) => {
 
 const deletePostFB = (id) => {
   return async function (dispatch, getState, { history }) {
-    console.log(id);
+    // console.log(id);
     const postDB = firestore.collection("post");
     const _id = postDB.doc(id);
-    console.log(_id);
+    // console.log(_id);
     await deleteDoc(doc(postDB, id)).then(window.location.replace("/"));
   };
 };
